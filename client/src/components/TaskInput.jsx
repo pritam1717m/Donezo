@@ -1,38 +1,54 @@
-import React, { useState } from 'react'
-import {ArrowUp} from 'lucide-react';
-function TaskInput({onAddTodo}) {
-    const [input, setInput] = useState("");
-    function handleInput(){
-        if (input.trim() === "") {
-            return alert("Please Enter What to Do")
-        }
-
-        const newTask = {
-            id: Date.now(),
-            task: input
-        };
-       onAddTodo(newTask) ;
-        setInput("")
+import React, { useState } from "react";
+import { AlarmClock, ArrowUp, Calendar, XIcon } from "lucide-react";
+function TaskInput({ onAddTodo }) {
+  const [input, setInput] = useState("");
+  function handleInput() {
+    if (input.trim() === "") {
+      return alert("Please Enter What to Do");
     }
+
+    const newTask = {
+      id: Date.now(),
+      task: input,
+    };
+    onAddTodo(newTask);
+    setInput("");
+  }
   return (
-    <div className='flex justify-center p-4 w-full'>
-      <div className='w-full max-w-xl flex items-center gap-2'>
+    <div className="flex justify-center p-4 w-full">
+      <div className="w-full max-w-xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <textarea
-          type='text'
-          placeholder='Add task'
-          className='w-full h-30 border-2 border-gray-200 rounded-md focus:outline-none px-3 py-2'
+          placeholder="Add task"
+          className="w-full h-30 resize-none border-0 bg-transparent px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-0"
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
-        <button
-          onClick={handleInput}
-          className='bg-red-600 text-white rounded-md p-2 flex items-center justify-center hover:bg-red-700'
-        >
-          <ArrowUp className='w-5 h-5' />
-        </button>
+
+        <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-600">
+              <Calendar className="h-4 w-4 text-gray-400" /> Date
+            </button>
+            <button className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-600">
+              <AlarmClock className="h-4 w-4 text-gray-400" />
+              Reminders
+            </button> 
+          </div>
+          <div className="flex gap-2">
+          <button className="rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600">
+              <XIcon className="h-7 w-7" strokeWidth={1} />
+            </button>
+          <button
+            onClick={handleInput}
+            className="flex items-center justify-center rounded-md bg-red-600 p-2 text-white transition hover:bg-red-700"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </button>
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default TaskInput
+export default TaskInput;

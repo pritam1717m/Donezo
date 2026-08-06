@@ -24,12 +24,16 @@ function Home() {
   function deleteTodo(id){
     setInputs(inputs.filter((input) => input.id !== id));
   }
+
+
+  
   return (
     <>
       <Navbar/>
       <TaskInput onAddTodo={addTodo}/>
       <TaskContainer tasks={inputs} 
-      onDelete={deleteTodo}/>
+      onDelete={deleteTodo}
+      />
     </>
   )
 }
