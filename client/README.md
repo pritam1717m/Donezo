@@ -1,50 +1,137 @@
-# React + TypeScript + Vite
+# Donezo - Task Management App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, full-stack task management application built with React, TypeScript, and Express. Stay organized and productive with an intuitive interface and robust backend.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- ✅ **Create & Manage Tasks** - Add, edit, and delete tasks with ease
+- 🎨 **Theme Toggle** - Switch between light and dark modes
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
+- 🔐 **Secure Authentication** - JWT-based user authentication
+- 🎯 **Organized Layout** - Sidebar navigation for better organization
+- ⚡ **Fast & Modern** - Built with React + Vite for optimal performance
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Frontend
+- **React 18** - UI library
+- **TypeScript** - Type-safe JavaScript
+- **Vite** - Lightning-fast build tool
+- **Tailwind CSS** - Utility-first CSS framework
+- **React Router** - Client-side routing
+- **Lucide React** - Icon library
 
-- Configure the top-level `parserOptions` property like this:
+### Backend
+- **Express.js** - Web server framework
+- **MongoDB** - NoSQL database
+- **Mongoose** - MongoDB object modeling
+- **JWT** - Secure authentication
+- **Zod** - Schema validation
+- **CORS** - Cross-origin resource sharing
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📋 Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- MongoDB (local or Atlas)
+
+## 📦 Installation & Setup
+
+### 1. Clone the repository
+```bash
+git clone <repository-url>
+cd Donezo
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+### 2. Setup Backend
+```bash
+cd server
+npm install
 ```
+
+Create a `.env` file in the server directory:
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PORT=5000
+```
+
+### 3. Setup Frontend
+```bash
+cd ../client
+npm install
+```
+
+## 🚀 Running the Application
+
+### Start the Backend Server
+```bash
+cd server
+npm start
+```
+The server will run on `http://localhost:5000`
+
+### Start the Frontend Development Server
+```bash
+cd client
+npm run dev
+```
+The app will open at `http://localhost:5173`
+
+### Build for Production
+```bash
+cd client
+npm run build
+```
+
+## 📁 Project Structure
+
+```
+Donezo/
+├── client/                 # React frontend
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/         # Page components
+│   │   ├── assets/        # Static assets
+│   │   └── App.jsx        # Main app component
+│   └── vite.config.ts     # Vite configuration
+│
+└── server/                # Express backend
+    ├── src/
+    │   ├── controllers/   # Route handlers
+    │   ├── routes/        # API routes
+    │   ├── db/            # Database configuration
+    │   └── middlewares/   # Express middlewares
+    └── package.json
+```
+
+## 🔗 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+
+### Tasks
+- `GET /api/todo` - Get all tasks
+- `POST /api/todo` - Create new task
+- `PUT /api/todo/:id` - Update task
+- `DELETE /api/todo/:id` - Delete task
+
+## 📝 Scripts
+
+### Frontend
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+### Backend
+- `npm start` - Start the server
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open issues.
+
+## 📄 License
+
+ISC License
