@@ -6,10 +6,10 @@ import ToggleTheme from "./ToggleTheme";
 function Navbar({ toggle, onToggleBg }) {
   return (
     <nav
-      className={`w-full border-b-2  ${toggle ? "border-white/10" : "border-gray-200"}`}
+      className={`w-full h-20 border-b-2  ${toggle ? "border-white/10" : "border-gray-200"}`}
     >
       <div className="flex items-center justify-between">
-        <div className="flex ml-5">
+        <div className="flex ml-5 ">
           <Link to="/" className="max-md:flex-1">
             <img
               src={Donezo_logo}

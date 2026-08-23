@@ -1,21 +1,27 @@
 import { AlarmClock, ArrowUp, CheckIcon, EditIcon, XIcon } from "lucide-react";
 import React, { useState } from "react";
+import DatePicker from "./DatePicker";
+import ReminderPicker from "./ReminderPicker";
 
 function TaskForm({
   mode = "add",
   intialValue = "",
+  intialDate = "",
+  initialTime = "",
   onSubmit,
   onCancel,
   toggle,
+  
 }) {
   const [value, setValue] = useState(intialValue);
-  const [showCalender, setShowCalender] = useState("");
-
+  const [showCalender, setShowCalender] = useState(intialDate);
+  const [reminder, setReminder] = useState(initialTime);
+ 
   function handleSubmit() {
     if (value.trim() === "") {
       return alert("Write Your Task");
     }
-    onSubmit(value.trim());
+    onSubmit(value.trim(), showCalender, reminder);
     setValue("");
   }
 
@@ -29,6 +35,8 @@ function TaskForm({
       return;
     }
     setValue("");
+    setShowCalender("");
+    setReminder("");
   }
 
   function handleKeyDown(e) {
@@ -39,28 +47,35 @@ function TaskForm({
   }
 
   return (
-    <div className="flex justify-center p-4 w-full">
-      <div className="w-full max-w-xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ">
+    <div className="flex justify-center mt-10 p-4 w-full">
+      <div className="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-700  shadow-sm ">
         <textarea
-          className="autofocus w-full h-30 resize-none border-0 bg-transparent px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-0"
+          className={`autofocus w-full h-30 resize-none border-0 bg-transparent px-4 py-3 text-sm focus:outline-none focus:ring-0 ${
+    toggle
+      ? "bg-[#07090B] text-zinc-300 placeholder:text-gray-500"
+      : "bg-white text-gray-700 placeholder:text-gray-400"
+  }`}
           value={value}
           placeholder={mode === "edit" ? "" : "Add task"}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
         />
 
-        <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-3 py-2.5">
+        <div className={`flex items-center justify-between border-t border-zinc-700 px-3 py-2.5 ${
+    toggle
+      ? "bg-[#07090B] text-white"
+      : "bg-white text-gray-700"
+  }`}>
           <div className="flex items-center gap-2 focus:outline-none focus:ring-0">
-            <input
-              type="date"
-              value={showCalender}
-              onChange={(e) => setShowCalender(e.target.value)}
-              className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-600 cursor-pointer"
+           <DatePicker 
+           value={showCalender}
+           onChange={setShowCalender}
+           toggle={toggle}
             />
-            <button className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-600 cursor-pointer">
-              <AlarmClock className="h-4 w-4 text-gray-400" />
-              Reminders
-            </button>
+            <ReminderPicker
+            value={reminder}
+            onChange={setReminder}
+            toggle={toggle}/>
           </div>
           <div className="flex gap-2">
             <button

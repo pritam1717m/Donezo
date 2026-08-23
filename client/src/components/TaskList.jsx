@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Circle, CircleCheck, EditIcon } from "lucide-react";
+import { formatTaskDate } from "../utils/dateUtils";
+import { formatTaskTime } from "../utils/timeUtils";
 
-function TaskList({ tasks, onDelete, onStartEdit }) {
+function TaskList({ tasks, onDelete, onStartEdit, toggle }) {
   const [hoveredId, setHoveredId] = useState(null);
 
   return (
@@ -10,8 +12,9 @@ function TaskList({ tasks, onDelete, onStartEdit }) {
         {tasks?.map((task) => (
           <li
             key={task.id}
-            className="group mb-2 text-left pl-2 border-b border-gray-200 p-2 "
-          >
+            className={`group mb-2 text-left pl-2 border rounded-md border-zinc-800 p-2 ${toggle ? 
+              'bg-[#121417] text-zinc-300' : 
+              'bg-white text-gray-900'}`}>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <button
@@ -27,6 +30,16 @@ function TaskList({ tasks, onDelete, onStartEdit }) {
                   )}
                 </button>
                 <span className="text-sm">{task.task}</span>
+                {task.date && (
+                  <div className={`text-xs mt-1 ${toggle ? 'text-orange-500' : 'text-orange-600'}`}>
+                    {formatTaskDate(task.date)}
+                  </div> )}
+                {task.reminder && (
+                  <div className={`text-xs mt-1 ${toggle ? 'text-orange-500' : 'text-orange-600'}`}>
+                    {formatTaskTime(task.reminder)}
+                  </div>
+                )}
+               
               </div>
               <button
                 onClick={() => onStartEdit(task)}
