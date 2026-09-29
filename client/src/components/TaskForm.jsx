@@ -5,24 +5,28 @@ import ReminderPicker from "./ReminderPicker";
 
 function TaskForm({
   mode = "add",
-  intialValue = "",
-  intialDate = "",
+  initialValue = "",
+  initialDate = "",
   initialTime = "",
   onSubmit,
   onCancel,
   toggle,
   
 }) {
-  const [value, setValue] = useState(intialValue);
-  const [showCalender, setShowCalender] = useState(intialDate);
-  const [reminder, setReminder] = useState(initialTime);
+  const [value, setValue] = useState(initialValue);
+  const [showCalender, setShowCalender] = useState(initialDate);
+  const [taskTime, setTaskTime] = useState(initialTime);
+  const [reminderBefore, setReminderBefore] = useState(0);
  
   function handleSubmit() {
     if (value.trim() === "") {
       return alert("Write Your Task");
     }
-    onSubmit(value.trim(), showCalender, reminder);
+    onSubmit(value.trim(), showCalender,taskTime, reminderBefore);
     setValue("");
+    setShowCalender("");
+    setTaskTime("");
+    setReminderBefore(0);
   }
 
   function handleCancel() {
@@ -47,10 +51,10 @@ function TaskForm({
   }
 
   return (
-    <div className="flex justify-center mt-10 p-4 w-full">
+    <div className="flex flex-col items-center justify-center pt-4 px-4 mt-10 w-full">
       <div className="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-700  shadow-sm ">
         <textarea
-          className={`autofocus w-full h-30 resize-none border-0 bg-transparent px-4 py-3 text-sm focus:outline-none focus:ring-0 ${
+          className={`autofocus w-full max-w-xl ml-0 space-y-1 h-30 resize-none border-0 bg-transparent px-4 py-3 text-sm focus:outline-none focus:ring-0 ${
     toggle
       ? "bg-[#07090B] text-zinc-300 placeholder:text-gray-500"
       : "bg-white text-gray-700 placeholder:text-gray-400"
@@ -73,9 +77,23 @@ function TaskForm({
            toggle={toggle}
             />
             <ReminderPicker
-            value={reminder}
-            onChange={setReminder}
+            value={taskTime}
+            onChange={setTaskTime}
             toggle={toggle}/>
+
+            <select
+            value={reminderBefore}
+            onChange={(e) => setReminderBefore(Number(e.target.value))}
+            className="text-sm border rounded-md px-2 py-1">
+              <option value={0}>No reminder</option>
+              <option value={5}>5 minutes before</option>
+              <option value={10}>10 minutes before</option>
+              <option value={15}>15 minutes before</option>
+              <option value={20}>20 minutes before</option>
+              <option value={30}>30 minutes before</option>
+              <option value={60}>1 hour before</option>
+              <option value={1440}>1 day before</option>
+            </select>
           </div>
           <div className="flex gap-2">
             <button
