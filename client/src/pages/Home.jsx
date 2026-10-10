@@ -1,71 +1,111 @@
-import React, { useEffect, useState } from 'react';
-import Navbar from '../components/Navbar';
-import TaskInput from '../components/TaskInput';
-import TaskContainer from '../components/TaskContainer';
-import AddTask from '../components/AddTask';
+import React, { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
+import TaskContainer from "../components/TaskContainer";
+
 
 function Home() {
   const [inputs, setInputs] = useState([]);
   const [editId, setEditId] = useState(null);
-  const [editText, setEditText] = useState('');
   const [toggle, setToggle] = useState(false);
-    
+  const [formMode, setFormMode] = useState(null);
+ 
+
   useEffect(() => {
-    const saveTask = localStorage.getItem('tasks');
+    const saveTask = localStorage.getItem("tasks");
     if (saveTask) {
       setInputs(JSON.parse(saveTask));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(inputs));
+    localStorage.setItem("tasks", JSON.stringify(inputs));
   }, [inputs]);
 
-  function addTodo(newTask) {
+  function addTodo(text, selectedDate, reminder) {
+    const newTask = {
+      id: Date.now(),
+      task: text,
+      date: selectedDate || "",
+      reminder: reminder || null,
+      completed: false,
+    };
     setInputs((prev) => [...prev, newTask]);
-  } 
-  function deleteTodo(id) {
-    setInputs((current) => 
-      current.filter((input) => input.id !== id));
+    setFormMode(null);
   }
-  function startEditing(task){
-  setEditId(task.id);
-  setEditText(task.task);
-  }
-  function saveEdit(id){
-    if(editText.trim() === "")
-      return;
-    setInputs((prev) => prev.map((task) => task.id ===id ? {...task, task: editText} : task));
-    setEditId(null);
-    setEditText("");
-  }
- function cancelEdit(){
-  setEditId(null);
-  setEditText("");
- }
 
- function toggleBg(){
-        setToggle((prev) => !prev);
-    }
+  function toggleTask(id) {
+    setInputs((current) =>
+      current.map((task) =>
+        task.id === id 
+    ? { ...task, completed: !task.completed } 
+    : task,
+      ),
+    );
+  }
+
+  function startEditing(task) {
+    setEditId(task.id);
+    setFormMode("edit");
+  }
+
+  function saveEdit(id, newText, selectedDate, reminder) {
+    setInputs((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              task: newText,
+              date: selectedDate || task.date,
+              reminder: reminder || null,
+            }
+          : task,
+      ),
+    );
+    setEditId(null);
+    setFormMode(null);
+  }
+
+  function cancelEdit() {
+    setEditId(null);
+    setFormMode(null);
+  }
+
+  function openAddForm() {
+    setEditId(null);
+    setFormMode("add");
+  }
+
+  function cancelAdd() {
+    setFormMode(null);
+  }
+
+  function toggleBg() {
+    setToggle((prev) => !prev);
+  }
+
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${toggle 
-      ? 
-      "bg-[#07090B] text-white bg-[radial-gradient(circle_at_50%_40%,rgba(0,255,255,0.08),transparent_35%)] bg-size:80px_80px" 
-     : "bg-white text-gray-900"}`}>
-      <Navbar 
-      toggle={toggle}
-      onToggleBg={toggleBg}/>
-   
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        toggle
+          ? "bg-[#07090B] text-zinc-300 bg-[radial-gradient(circle_at_50%_40%,rgba(0,255,255,0.08),transparent_35%)] bg-size:80px_80px"
+          : "bg-white text-gray-900"
+      }`}
+    >
+      <Navbar toggle={toggle} onToggleBg={toggleBg} />
+     
       <TaskContainer
         tasks={inputs}
-        onDelete={deleteTodo}
-        onAddTodo={addTodo}
+        onDelete={toggleTask}
+        onSubmit={addTodo}
         editId={editId}
-        editText={editText}
-        setEditText={setEditText}
+        formMode={formMode}
         onStartEdit={startEditing}
-        onEditTodo={saveEdit}
-        onCancelEdit={cancelEdit}/>
+        onEdit={saveEdit}
+        onCancelEdit={cancelEdit}
+        onCancelAdd={cancelAdd}
+        onOpenAddForm={openAddForm}
+        toggle={toggle}
+      />
     </div>
   );
 }

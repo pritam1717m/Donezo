@@ -84,6 +84,38 @@ cd client
 npm run build
 ```
 
+## Deploying to Vercel
+
+Deploy the `client` and `server` directories as separate Vercel projects, setting
+each project's **Root Directory** to its respective directory.
+
+For the client project, set `VITE_API_URL` to the deployed backend's origin
+(for example, `https://donezo-api.vercel.app`, without a trailing slash).
+Vite embeds this value during the client build. Client-side routes fall back to
+`index.html`, and local development proxies `/api` to `http://localhost:5000`.
+
+For the server project, configure these environment variables:
+
+- `MONGO_URI` — MongoDB connection string
+- `JWT_SECRET` — secret used to sign authentication tokens
+- `CLIENT_URL` — deployed client origin, such as `https://donezo.vercel.app`
+- `RESEND_API_KEY` — API key used to send reminder emails
+- `CRON_SECRET` — a long, random secret used to authorize the reminder cron. Generate one with:
+
+  ```powershell
+  node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+  ```
+
+  Add the generated value as `CRON_SECRET` in the server project's Vercel
+  Environment Variables for Production (and Preview if needed), then redeploy.
+  Keep the value in Vercel's environment settings; do not commit it to this
+  README or other source files. Vercel sends it to the cron endpoint as a
+  `Bearer` authorization header.
+
+The server's `vercel.json` schedules reminders once per minute. Vercel Cron
+frequency is subject to the project's Vercel plan. The cron endpoint rejects
+requests unless Vercel sends the matching `CRON_SECRET` authorization header.
+
 ## 📁 Project Structure
 
 ```

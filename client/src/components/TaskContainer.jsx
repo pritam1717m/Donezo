@@ -1,78 +1,160 @@
-import { CheckIcon, Circle, CircleCheck, EditIcon, XIcon } from "lucide-react";
-import React, { useState } from "react";
-import TaskInput from "./TaskInput";
-import AddTask from "./AddTask";
+import React, { useEffect, useState } from "react";
+import { createTask, getTasks, updateTask, deleteTask } from "../api/taskApi";
+import TaskForm from "./TaskForm";
+import TaskList from "./TaskList";
+import Sidebar from "./Sidebar";
 
-function TaskContainer({ tasks, onDelete, onAddTodo, onEditTodo, editId, editText, setEditText, onStartEdit, onCancelEdit }) {
-  const [hoveredId, setHoveredId] = useState(null);
-  const [isAddingTask, setIsAddingTask] = useState(false);
+function TaskContainer({
+  editId,
+  onStartEdit,
+  onCancelEdit,
+  formMode,
+  onCancelAdd,
+  toggle
+}) {
+
+  const [tasks, setTasks] = useState([]);
+  const [currentView, setCurrentView] = useState("active");
+
+  useEffect(()=> {
+    const loadTasks = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        
+        return;
+      }
+      try {
+        const data = await getTasks(token);
+        console.log("GET TASKS RESPONSE:", data);
+        
+        setTasks(data);
+      } catch (error) {
+        console.error("Failed to load tasks:",error.response?.data || error);
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+        }
+      }
+    };
+    loadTasks();
+  },[]);
+
+  const activeTasks = tasks.filter((task) => !task.completed);
+
+  const completedTasks = tasks.filter((task) => task.completed);
+
+  const activeCount = activeTasks.length;
+  const completedCount = completedTasks.length;
+
+  const handleCreateTask = async(text, date, taskTime, reminderBefore) => {
+    try {
+      const newTask = await createTask({
+        task: text,
+        date,
+        taskTime,
+        reminderBefore
+      });
+      setTasks((prevTasks)=>[ ...prevTasks, newTask]);
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    }
+  };
+
+  const handleEditTask = async (text, date, taskTime, reminderBefore) => {
+    try {
+      const updatedTask = await updateTask(editId, {
+        task: text,
+        date, 
+        taskTime,
+        reminderBefore,
+      });
+      setTasks((prevTasks) => 
+      prevTasks.map((task) =>
+        task._id === updatedTask._id ? updatedTask : task
+      ));
+      onCancelEdit();
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
+  };
+
+  const handleToggleTask = async(id) => {
+    try {
+      const task = tasks.find((task) => task._id === id);
+
+      if (!task) {
+        return;
+      }
+
+      const updatedTask = await updateTask(id,{
+        completed: !task.completed,
+      });
+
+      setTasks((prevTasks) => prevTasks.map((task) => task._id === updatedTask._id ? updatedTask : task));
+    } catch (error) {
+      console.error("Failed to update task:",error);
+    }
+  };
+
+  const handleDeleteTask = async(id) => {
+    try {
+      await deleteTask(id);
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  };
+
   
 
   return (
+    <div className="flex w-full min-h-screen">
+      <Sidebar
+      currentView={currentView}
+      onChangeView={setCurrentView}
+      activeCount={activeCount}
+      completedCount={completedCount}
+      toggle={toggle}
+      />
+    <main className="flex-1">
     <div className="flex flex-col items-center pt-4 w-full">
-      <ul className="w-full max-w-xl list-inside space-y-1 text-lg pt-2 ml-0 px-4">
-        {tasks?.map((task) => (
-          <li
-            key={task.id}
-            className="group mb-2 text-left pl-2 border-b border-gray-200 p-2 "
-          >
-                {editId === task.id ? 
-                (<div>
-                <div className="flex w-full max-w-xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                  <textarea value={editText}
-                  onChange={(e)=>setEditText(e.target.value)}
-                  placeholder="Add task"
-          className="w-full h-30 resize-none border-0 bg-transparent px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-0" autoFocus/>
-           <button
-              onClick={onCancelEdit}
-              className="rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 cursor-pointer"
-            >
-              <XIcon className="h-7 w-7" strokeWidth={1} />
-            </button>
-          <button onClick={()=> onEditTodo(task.id)}
-          className="flex items-center justify-center rounded-md bg-red-600 p-2 text-white transition hover:bg-red-700 cursor-pointer">
-            <CheckIcon className="w-5 h-5" /></button>
-                </div></div>
-                  ): (<div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => onDelete(task.id)}
-                  onMouseEnter={() => setHoveredId(task.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  className="text-gray-400 transition hover:text-orange-600"
-                >
-                  {hoveredId === task.id ? (
-                    <CircleCheck className="h-5.5 w-5.5" strokeWidth={1} />
-                  ) : (
-                    <Circle className="h-5.5 w-5.5" strokeWidth={1} />
-                  )}
-                </button>
-                  <span className="text-sm"   
-                  >{task.task}</span>
-              </div>
-              <button onClick={()=> onStartEdit(task)}  className="
-                    hidden
-                    group-hover:block
-                    text-gray-400
-                    hover:text-gray-700
-                  "><EditIcon className="h-5 w-5" strokeWidth={1}/></button>
-            </div>)}
-          </li>
-        ))}
-        {!isAddingTask && (
-          <li>
-            <AddTask onTaskAdded={()=> setIsAddingTask(true)}/>
-          </li>
-        )}
-        {isAddingTask && (
-          <li>
-            <TaskInput 
-            onAddTodo={onAddTodo}
-            onTaskAdded={()=> setIsAddingTask(false)}
-            onCancel={()=> setIsAddingTask(false)}/>
-          </li>
-        )}
-      </ul>
+      {formMode === null && (
+        <div>
+          <TaskForm 
+          mode="add" 
+          onSubmit={handleCreateTask} 
+          onCancel={onCancelAdd} 
+          toggle={toggle}/>
+        </div>
+      )}
+      {formMode === "add" && (
+        <div>
+          <TaskForm 
+          mode="add" 
+          onSubmit={handleCreateTask} 
+          onCancel={onCancelAdd} />
+        </div>
+      )}
+      {formMode === "edit" && (
+        <div>
+          <TaskForm
+            mode="edit"
+            initialValue={tasks.find((task) => task._id === editId)?.task || ""}
+            initialDate={tasks.find((task) => task._id === editId)?.date || ""}
+            initialTime={tasks.find((task) => task._id === editId)?.reminder || ""}
+            onSubmit={handleEditTask}
+            onCancel={onCancelEdit}
+            toggle={toggle}
+          />
+        </div>
+      )}
+      <TaskList  
+      tasks={currentView === 'active' ? activeTasks : completedTasks} 
+      onDelete={handleDeleteTask} 
+      onToggleTask={handleToggleTask}
+      onStartEdit={onStartEdit} 
+      toggle={toggle} />
+    </div>
+    </main>
     </div>
   );
 }
